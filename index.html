@@ -1,0 +1,569 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#07162c"><title>Captain Arlo's Dino Galaxy – Portrait Developer Build</title><style>
+*{box-sizing:border-box}body{margin:0;color:#f7fbff;font-family:system-ui,Arial;background:radial-gradient(ellipse at 75% 15%,#244a83 0,#091b39 47%,#050d1f 100%);min-height:100dvh}button,input{font:inherit}button{cursor:pointer;border:0;border-radius:16px;font-weight:800;touch-action:manipulation}button:disabled{opacity:.35;cursor:not-allowed}.wrap{max-width:1100px;margin:auto;padding:14px}.top{display:flex;justify-content:space-between;align-items:center;gap:8px}.brand{font-size:clamp(18px,3vw,28px);font-weight:900;color:#ffe77a}.pill{background:#213f6a;padding:8px 13px;border-radius:30px}.screen{display:none}.screen.active{display:block}.hero{display:grid;grid-template-columns:1.1fr 1fr;gap:18px;align-items:center;margin-top:12px}.hero img{width:100%;border-radius:24px;max-height:60dvh;object-fit:contain}.card{background:#10294acc;border:1px solid #4e86b8;border-radius:24px;padding:20px;box-shadow:0 10px 30px #0005}h1{font-size:clamp(27px,4vw,48px);margin:0 0 10px}h2{margin:5px 0 15px}.muted{color:#c6d8f3}.primary{background:linear-gradient(#ffe68b,#ffb92b);color:#172644;padding:15px 24px;box-shadow:0 5px 0 #ad7116}.secondary{background:#2e5688;color:white;padding:12px 18px}.controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}input{background:#e9f4ff;color:#102a4e;border:0;border-radius:12px;padding:13px;max-width:100%;font-size:20px}.map{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.planet{background:#17365a;border:1px solid #5d85aa;padding:12px;min-height:92px;color:white}.planet.selected{outline:3px solid #ffe27b}.planet .orb{display:block;font-size:36px}.missions{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:15px}.mission{background:linear-gradient(145deg,#23578b,#142c55);color:white;min-height:112px;padding:18px;border:1px solid #6fa5dd;text-align:left}.mission b{font-size:19px}.mission small{display:block;margin-top:8px;color:#d0e5ff}.layout{display:grid;grid-template-columns:1fr minmax(260px,380px);gap:16px;margin-top:15px}.question{font-size:clamp(30px,5vw,60px);font-weight:900;text-align:center;padding:20px 0;color:#ffdf79}.answer{font-size:clamp(24px,4vw,42px);background:#071e3c;border:2px solid #59b9e6;border-radius:14px;padding:12px;min-height:66px;text-align:center;letter-spacing:3px}.pad{background:linear-gradient(140deg,#224b74,#102d56);padding:14px;border-radius:22px;border:2px solid #5cbee6}.keys{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:12px}.key{padding:11px 0;background:linear-gradient(#62d9ff,#2384c8);color:#09213d;font-size:25px;box-shadow:0 3px 0 #12547d}.key.action{background:#ffd575}.key.launch{background:#9ef0a6;grid-column:span 3;font-size:18px}.feedback{min-height:45px;color:#ffe07c;font-weight:800;font-size:20px}.progress{height:14px;background:#071a31;border-radius:20px;overflow:hidden}.bar{height:100%;width:0;background:linear-gradient(90deg,#5cf4bb,#ffe17b);transition:width .3s}.footer{font-size:12px;color:#afc7e6;text-align:center;padding:20px} @media(max-width:680px){.hero,.layout{grid-template-columns:1fr}.hero img{max-height:none;height:auto;max-width:100%;object-fit:contain}.map{grid-template-columns:repeat(4,1fr)}.planet{padding:6px;min-height:75px;font-size:11px}.planet .orb{font-size:24px}.wrap{padding:9px}.card{padding:13px}.question{padding:7px 0}.key{padding:9px 0}}@media(orientation:landscape) and (max-height:550px){.hero img{max-height:none;object-fit:contain}.card{padding:12px}.key{padding:7px 0}.question{padding:4px 0}.layout{grid-template-columns:1fr 330px}}
+@media (orientation:portrait){.wrap{max-width:680px}.hero{grid-template-columns:1fr;gap:10px}.hero img{display:block;width:100%;height:auto;max-height:none;object-fit:contain;border-radius:18px}.hero .card{padding:13px 16px}.hero h1{font-size:clamp(23px,5.5vw,34px)}.hero p{margin:7px 0}.hero .controls{margin-top:9px}.layout{grid-template-columns:1fr}.top{flex-wrap:wrap}}@media(max-width:450px){.brand{font-size:17px}.top button{padding:8px 10px}.hero{margin-top:7px}} 
+
+.pad{position:relative;overflow:hidden;isolation:isolate;background:radial-gradient(ellipse at 50% 15%,#254c86,#08152f 85%);border:3px solid #65e3ff;box-shadow:0 0 25px #27caff66}
+.pad>*:not(.dino-sky){position:relative;z-index:2}
+.dino-sky{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;opacity:.73}
+.dino-float{position:absolute;font-size:clamp(34px,8vw,62px);animation:drift 8s ease-in-out infinite alternate;filter:drop-shadow(0 5px 8px #0008)}
+.dino-float .helmet{position:absolute;inset:-7px -8px 5px;border:2px solid #a9f3ff99;border-radius:50%;background:linear-gradient(120deg,#b8f9ff40,transparent 55%);box-shadow:inset 5px 5px 9px #d7fbff25}
+.dino-float:nth-child(1){top:8%;left:3%}.dino-float:nth-child(2){top:24%;right:2%;animation-delay:-3s}.dino-float:nth-child(3){bottom:23%;left:2%;animation-delay:-5s}.dino-float:nth-child(4){bottom:6%;right:5%;animation-delay:-2s}
+@keyframes drift{from{transform:translate(-4px,-9px) rotate(-12deg)}to{transform:translate(12px,15px) rotate(14deg)}}
+.pad:before{content:'✦  ·  ✧    ·  ✦     ·    ✧';position:absolute;inset:12% 0;color:#a9f8ff88;letter-spacing:20px;line-height:95px;white-space:normal}
+.pad .answer,.pad .key{position:relative;z-index:3}
+.pad .answer{background:#071b36e8;border:2px solid #8ceeff}
+.pad .key{box-shadow:0 3px 0 #12547d,0 0 10px #001b38}
+@media(prefers-reduced-motion:reduce){.dino-float{animation:none}}
+
+/* Version 4: animated, interactive planetary navigation */
+#earth .map{position:relative;display:block;height:clamp(470px,76vh,730px);min-height:470px;overflow:hidden;border-radius:24px;border:2px solid #5bd8ff66;background:radial-gradient(ellipse at 55% 46%,#17366a 0%,#07152f 55%,#020715 100%);isolation:isolate}
+#earth .map:before{content:"";position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(2px 2px at 12% 19%,white 80%,transparent),radial-gradient(2px 2px at 75% 11%,#c6efff 80%,transparent),radial-gradient(2px 2px at 44% 65%,white 80%,transparent),radial-gradient(2px 2px at 88% 73%,white 80%,transparent),radial-gradient(1px 1px at 23% 87%,white 80%,transparent),radial-gradient(1px 1px at 65% 41%,white 80%,transparent);background-size:180px 180px;animation:starslide 35s linear infinite;opacity:.8}
+@keyframes starslide{to{background-position:180px -180px}}
+#earth .map .planet{position:absolute;left:var(--x);top:var(--y);width:clamp(72px,17%,118px);min-height:0;padding:4px;border:0;background:none;box-shadow:none;color:white;display:flex;flex-direction:column;align-items:center;gap:4px;transform:translate(-50%,-50%);z-index:2;animation:planetfloat var(--speed) ease-in-out infinite alternate;touch-action:manipulation;cursor:pointer}
+#earth .map .planet .orb{display:block;position:relative;width:clamp(55px,13vw,90px);height:clamp(55px,13vw,90px);border-radius:50%;font-size:0;box-shadow:inset -15px -8px 19px #000a,inset 8px 6px 14px #ffffff55,0 0 17px #6ce3ff55;transition:filter .25s,scale .25s;background:var(--surface);border:1px solid #ffffff44}
+#earth .map .planet:hover .orb,#earth .map .planet:focus-visible .orb{scale:1.12;filter:brightness(1.25)}
+#earth .map .planet.selected .orb{box-shadow:inset -15px -8px 19px #0008,inset 8px 6px 14px #ffffff55,0 0 22px 6px #65e9ff}
+#earth .map .planet .planet-label{background:#071a39db;border:1px solid #83d7ff55;border-radius:20px;padding:4px 8px;font-size:clamp(11px,2.7vw,14px);font-weight:900;text-shadow:0 1px 3px #000;white-space:nowrap}
+#earth .map .planet[data-world="0"] .orb{background:radial-gradient(circle at 28% 26%,#bfb6a9,#6c6761 48%,#373637 80%)}
+#earth .map .planet[data-world="1"] .orb{background:repeating-linear-gradient(170deg,#d5a66c 0 12px,#f4d4a0 13px 21px,#9f6f4d 22px 29px)}
+#earth .map .planet[data-world="2"] .orb{background:radial-gradient(ellipse at 34% 45%,#50b878 0 15%,transparent 16%),radial-gradient(ellipse at 70% 25%,#6dbb6b 0 12%,transparent 13%),radial-gradient(ellipse at 57% 77%,#4ab679 0 16%,transparent 17%),repeating-linear-gradient(155deg,#1c79c6 0 15px,#f0f8ff 17px 21px,#1479ba 24px 38px)}
+#earth .map .planet[data-world="3"] .orb{background:radial-gradient(circle at 28% 24%,#ffc082,#d65d30 44%,#863823 78%)}
+#earth .map .planet[data-world="4"] .orb{background:repeating-linear-gradient(172deg,#d8a87e 0 9px,#f6e1b6 10px 17px,#aa6b54 18px 25px,#d4b494 26px 34px)}
+#earth .map .planet[data-world="5"] .orb{background:repeating-linear-gradient(175deg,#d9c393 0 10px,#9d8564 11px 15px,#f4e2ae 16px 29px)}
+#earth .map .planet[data-world="5"] .orb:after{content:"";position:absolute;left:-27%;top:34%;width:154%;height:31%;border:9px solid #d5c7a4b0;border-left-color:#f1e0bd;border-right-color:#ab9a75;transform:rotate(-25deg);border-radius:50%;box-sizing:border-box}
+#earth .map .planet[data-world="6"] .orb{background:linear-gradient(150deg,#b4ffff,#67d5d7,#3e97ad)}
+#earth .map .planet[data-world="7"] .orb{background:linear-gradient(155deg,#6ea8ff,#2660d4,#142e8e)}
+@keyframes planetfloat{0%{translate:-7px -11px;rotate:-5deg}100%{translate:10px 12px;rotate:6deg}}
+.space-rocket{position:absolute;left:-80px;top:var(--ry);font-size:30px;pointer-events:none;z-index:1;filter:drop-shadow(-12px 3px 5px #ffb93d);animation:rocketpass var(--rd) linear infinite;animation-delay:var(--delay)}
+@keyframes rocketpass{0%,8%{transform:translateX(-100px) rotate(-17deg);opacity:0}12%{opacity:1}65%{opacity:1}76%,100%{transform:translateX(calc(100vw + 180px)) rotate(-17deg);opacity:0}}
+#earth .map .planet:focus-visible{outline:3px solid #ffe778;outline-offset:6px}
+@media(prefers-reduced-motion:reduce){#earth .map .planet,.space-rocket,#earth .map:before{animation:none}}
+
+/* Version 8: planet discovery */
+#earth .map .planet .orb{background-size:cover!important;background-position:center!important;box-shadow:inset -17px -10px 22px #000b,inset 6px 5px 12px #ffffff40,0 0 18px #76ceff66!important}
+#earth .map .planet[data-world="0"] .orb{background-image:url('https://science.nasa.gov/wp-content/uploads/2023/09/mercury-messenger-globe-pia15162.jpg')!important}
+#earth .map .planet[data-world="1"] .orb{background-image:url('https://science.nasa.gov/wp-content/uploads/2023/09/venus-mariner-10-pia23791.jpg')!important}
+#earth .map .planet[data-world="2"] .orb{background-image:url('https://science.nasa.gov/wp-content/uploads/2023/09/earth-blue-marble.jpg')!important}
+#earth .map .planet[data-world="3"] .orb{background-image:url('https://science.nasa.gov/wp-content/uploads/2023/09/mars-globe-valles-marineris-enhanced.jpg')!important}
+#earth .map .planet[data-world="4"] .orb{background-image:url('https://science.nasa.gov/wp-content/uploads/2023/09/jupiter.jpg')!important}
+#earth .map .planet[data-world="5"] .orb{background-image:url('https://science.nasa.gov/wp-content/uploads/2023/09/saturn.jpg')!important}
+#earth .map .planet[data-world="6"] .orb{background-image:url('https://science.nasa.gov/wp-content/uploads/2023/09/uranus-voyager-2.jpg')!important}
+#earth .map .planet[data-world="7"] .orb{background-image:url('https://science.nasa.gov/wp-content/uploads/2023/09/neptune-voyager-2.jpg')!important}
+#planetDiscovery{display:none;position:fixed;inset:0;z-index:1000;background:#02091ce8;align-items:center;justify-content:center;padding:18px;backdrop-filter:blur(9px)}
+#planetDiscovery.open{display:flex}
+.discovery-panel{width:min(94vw,480px);max-height:94dvh;overflow:auto;text-align:center;background:radial-gradient(ellipse at top,#1c4271,#07162c 75%);border:2px solid #6ecfff;border-radius:28px;padding:14px 18px 22px;box-shadow:0 0 65px #2a90ed55}
+.discovery-planet{width:clamp(150px,38vw,235px);height:clamp(150px,38vw,235px);margin:8px auto 16px;border-radius:50%;background-size:cover;background-position:center;box-shadow:inset -35px -16px 38px #000b,inset 14px 9px 22px #ffffff33,0 0 40px #7ccaff55;animation:discoveryPop .5s ease-out both}
+@keyframes discoveryPop{from{transform:scale(.4);opacity:.1}to{transform:scale(1);opacity:1}}
+.discovery-fact{font-size:clamp(19px,5vw,26px);font-weight:850;min-height:80px;color:#ffe79b;display:flex;align-items:center;justify-content:center}
+.discovery-buttons{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+@media(prefers-reduced-motion:reduce){.discovery-planet{animation:none}}
+
+/* V10: photographic planets cropped from supplied reference image */
+#earth .map .planet .orb{background-color:transparent!important;background-repeat:no-repeat!important;background-position:center!important;background-size:contain!important;border:0!important;border-radius:0!important;box-shadow:none!important;overflow:visible!important;width:clamp(62px,14vw,105px);height:clamp(62px,14vw,105px)}
+#earth .map .planet[data-world="5"] .orb{width:clamp(88px,20vw,158px);height:clamp(70px,16vw,115px)}
+#earth .map .planet .orb:after{display:none!important}
+#earth .map .planet.selected .orb{filter:drop-shadow(0 0 12px #73dfff)}
+.discovery-planet{background-color:transparent!important;background-size:contain!important;background-position:center!important;background-repeat:no-repeat!important;border-radius:0!important;box-shadow:none!important}
+#planetDiscovery .cadet-fact-list{text-align:left;font-size:clamp(15px,2.6vw,20px);line-height:1.5;padding-left:23px;margin:12px 0}#planetDiscovery .cadet-fact-list li{margin-bottom:9px}#planetDiscovery .discovery-panel{max-height:92dvh;overflow-y:auto}#planetDiscovery .discovery-fact{font-size:inherit}#planetDiscovery .planet-video-panel{width:min(96vw,980px);max-width:980px;max-height:94dvh;padding:12px;background:transparent;box-shadow:none;overflow:auto}#discoveryVideo{width:100%;max-height:85dvh;object-fit:contain;border-radius:16px;display:block;clear:both;background:#000}#planetDiscovery .planet-video-panel button{margin-bottom:8px}
+.academy-map{position:relative;width:100%;max-width:1100px;margin:12px auto;aspect-ratio:3/2;overflow:hidden;border-radius:22px;box-shadow:0 12px 35px #0007}
+.academy-art{display:block;width:100%;height:100%;object-fit:cover}
+.academy-zone{position:absolute;width:49%;height:36%;border:0;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;touch-action:manipulation}
+.academy-zone:focus-visible{outline:5px solid #ffe65b;outline-offset:-5px}
+.academy-zone:active .academy-label{transform:scale(.96);filter:brightness(1.25)}
+.zone-nw{left:1%;top:20%}.zone-ne{right:1%;top:20%}.zone-sw{left:1%;top:56%}.zone-se{right:1%;top:56%}
+.academy-label{display:block;background:linear-gradient(180deg,#17365a 0%,#071529 100%);color:#fff;border:3px solid #ffc955;border-radius:14px;padding:8px 12px;text-align:center;box-shadow:0 4px 0 #573819,0 5px 16px #000b;font-size:clamp(10px,1.5vw,19px);font-weight:900;line-height:1.25;max-width:95%;text-shadow:0 2px 2px #000;transition:transform .15s}
+.academy-label strong{color:#ffe16c;font-size:1.05em}.academy-label small{display:block;font-size:.75em;font-weight:600;color:#b8e9ff;margin-top:3px}
+@media(max-width:650px){.academy-map{border-radius:12px}.academy-label{padding:4px 5px;border-width:2px;border-radius:8px;font-size:clamp(9px,2.2vw,14px)}}
+#earth:before{content:"🛠 DEVELOPER MODE — ALL PLANETS ACCESSIBLE";display:block;text-align:center;font-weight:900;color:#ffe06a;padding:8px}#devAcademyButton{background:#235e73;color:white;border:2px solid #89e9ff;border-radius:12px;padding:9px 14px;cursor:pointer}
+.mars-map{position:relative;width:100%;max-width:960px;aspect-ratio:1.65;margin:16px auto;border-radius:25px;overflow:hidden;background:radial-gradient(ellipse at 48% 120%,#f3a05c 0%,#9e3e29 48%,#401f35 90%);border:5px solid #ec9858;box-shadow:inset 0 0 70px #41172e,0 12px 30px #0008}
+.mars-sky{position:absolute;top:2%;width:100%;text-align:center;font-size:clamp(18px,3vw,35px);color:#ffdbad}
+.mars-land{position:absolute;width:43%;height:37%;border:4px solid #ffd18b;border-radius:45% 40% 35% 48%;background:radial-gradient(ellipse at 35% 28%,#fbc17a,#c96432 55%,#6c2e2e);color:#fff;box-shadow:inset -14px -18px 22px #52242c,0 8px 18px #301526;font-size:clamp(12px,2vw,23px);font-weight:1000;text-shadow:0 3px 5px #32101c;cursor:pointer;touch-action:manipulation}
+.mars-land small{display:block;color:#ffe8b7;font-size:.7em}.mars-land:active{filter:brightness(1.3);transform:scale(.97)}.mars-land:focus-visible{outline:5px solid #fff}
+.mars-a{top:14%;left:5%;transform:rotate(-5deg)}.mars-b{top:14%;right:5%;transform:rotate(4deg)}.mars-c{bottom:7%;left:5%;transform:rotate(3deg)}.mars-d{bottom:7%;right:5%;transform:rotate(-4deg)}
+.mars-puzzle-layout{display:flex;gap:22px;align-items:flex-start;justify-content:center;flex-wrap:wrap}
+.mars-grid{display:grid;grid-template-columns:repeat(var(--cols),minmax(0,1fr));width:min(85vw,440px);gap:4px;touch-action:none;user-select:none}
+.mars-cell{aspect-ratio:1;background:#fff1d6;border:2px solid #e79a56;border-radius:9px;color:#41243a;font-size:clamp(17px,4vw,32px);font-weight:1000;touch-action:none;cursor:pointer}
+.mars-cell.mars-picked{background:#ffe065}.mars-cell.mars-found{background:#83e5b0;border-color:#22a06c}.mars-cell.mars-hint{outline:4px solid #ffcf00}
+.mars-words{background:#50263b;border:2px solid #e9a36a;border-radius:18px;padding:12px 20px;min-width:190px}.mars-word{padding:5px;font-size:20px;font-weight:900}.mars-word.done{color:#9cf0b9;text-decoration:line-through}
+#marsMessage{font-size:20px;font-weight:900;min-height:35px;margin-top:10px;color:#ffe6a1}
+
+/* Portrait-first 9:16 mobile layout, all screens */
+:root{color-scheme:dark}
+html,body{width:100%;max-width:100%;overflow-x:hidden}
+.wrap{width:min(100%,510px);max-width:510px;margin:auto;padding:10px 10px calc(16px + env(safe-area-inset-bottom))}
+.wrap>.top{gap:5px;display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;margin-bottom:10px}
+.wrap>.top .brand{font-size:clamp(13px,3.7vw,20px);line-height:1.15}
+.wrap>.top button{padding:9px 7px;font-size:clamp(10px,2.7vw,13px);border-radius:12px}
+.screen .card{padding:12px;border-radius:17px}
+.screen h1{font-size:clamp(24px,7vw,34px)}.screen h2{font-size:clamp(19px,5.4vw,26px);margin:4px 0 10px}
+.screen p{line-height:1.35}.hero{grid-template-columns:1fr;gap:12px}.hero img{max-height:53dvh;width:100%;object-fit:contain}
+.map{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.planet{min-height:88px;padding:8px}
+.layout{display:flex;flex-direction:column;gap:10px}.layout>.card{width:100%}
+.controls{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}.controls button{flex:1 1 auto;min-height:44px;padding:11px 12px;font-size:clamp(12px,3.5vw,16px)}
+.academy-map{aspect-ratio:9/13;max-width:100%;margin:10px auto}.academy-art{object-fit:cover}
+.academy-zone{width:49%;height:38%}.zone-nw,.zone-ne{top:14%}.zone-sw,.zone-se{top:54%}
+.academy-label{font-size:clamp(10px,3vw,14px);padding:6px 5px;line-height:1.15}
+.mars-map{aspect-ratio:9/13;max-width:100%;border-radius:20px;border-width:3px;background:radial-gradient(ellipse at 50% 65%,#e58a4d,#ad452e 53%,#391b35 95%)}
+.mars-land{width:45%;height:35%;border-width:3px;font-size:clamp(12px,3.3vw,17px);line-height:1.2}
+.mars-a{top:16%;left:3%}.mars-b{top:16%;right:3%}.mars-c{bottom:8%;left:3%}.mars-d{bottom:8%;right:3%}
+.mars-sky{font-size:20px}
+.mars-game{background:linear-gradient(180deg,#101f49,#3d2239 72%,#71352f);border-color:#ff9e59!important}
+.mars-game h2{text-align:center;color:#ffde75;text-shadow:0 2px 2px #4b1427;font-weight:1000}
+.mars-portrait-characters{display:block;width:100%;height:clamp(95px,27vw,150px);object-fit:cover;object-position:center 52%;border-radius:13px;border:2px solid #ef9657;margin:5px auto}
+#marsInstructions{text-align:center;background:#121f44;border:1px solid #578ed5;border-radius:10px;padding:7px;font-size:clamp(12px,3.3vw,15px);margin:7px 0 10px}
+.mars-puzzle-layout{display:flex;flex-direction:column;align-items:stretch;gap:8px}
+.mars-puzzle-layout>div:first-child{width:100%}
+.mars-grid{width:100%;max-width:100%;gap:3px;background:linear-gradient(130deg,#004aa5,#29b8ff,#003976);padding:7px;border:3px solid #44b6ff;border-radius:18px;box-shadow:0 3px 0 #001a4d}
+.mars-cell{min-width:0;border:1px solid #4b8bd0;border-radius:5px;font-size:clamp(16px,5.1vw,27px);padding:0;color:#132044;background:#fff9ee;box-shadow:inset 0 -2px 0 #c6cbd3}
+.mars-cell.mars-found{background:#8eebbd}.mars-cell.mars-picked{background:#ffdc61}
+.mars-words{width:100%;min-width:0;border:3px solid #e96550;background:linear-gradient(#d71d29 0 35px,#fff8ed 35px);border-radius:15px;padding:4px 9px 8px;color:#202037}
+.mars-words h3{text-align:center;color:white;margin:1px 0 7px;font-size:18px}
+#marsWordList{display:grid;grid-template-columns:1fr 1fr;gap:3px 8px}
+.mars-word{font-size:clamp(14px,4vw,19px);padding:3px 5px;color:#27243b;background:#ffffffd9;border-radius:7px}
+.mars-word.done{color:#167947;background:#d5ffdf}
+#marsCount{margin:5px 0 0;text-align:center;color:#333;font-weight:900}
+#marsMessage{font-size:15px;min-height:22px;margin-top:4px;text-align:center}
+#marsWords .controls{margin-top:10px;flex-wrap:nowrap}
+#marsWords .controls button{font-size:clamp(11px,3vw,15px);padding:9px 5px;min-width:0}
+#planetDiscovery .planet-video-panel{width:min(100vw,510px);max-width:510px;max-height:95dvh}
+#discoveryVideo{max-height:75dvh}
+@media(min-width:650px){body{background:radial-gradient(ellipse at center,#173962,#040e22)}.wrap{border-left:1px solid #4774a1;border-right:1px solid #4774a1;min-height:100dvh}}
+
+#jupiterAcademy,#jupiterLesson{background:radial-gradient(ellipse at 50% 10%,#895744,#241c4d 65%,#080c24);min-height:100dvh}
+.jup-wrap{max-width:490px;margin:auto;text-align:center;padding:16px 12px 45px;color:#fff}
+.jup-wrap h1{font-size:clamp(24px,7vw,38px);color:#ffe19c;text-shadow:0 3px #673d32}.jup-wrap h2{color:#ffe19c}
+.jup-ships{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:25px 0}
+.jup-ship{min-height:150px;background:linear-gradient(145deg,#3d81b5,#182955);border:3px solid #ffe0a1;border-radius:40% 40% 22px 22px;box-shadow:0 12px 0 #09132b,0 18px 25px #0008;color:#fff;font-size:55px;cursor:pointer;touch-action:manipulation}
+.jup-ship strong,.jup-ship small{display:block;font-size:13px;line-height:1.3}.jup-ship small{color:#ffe8b1;font-size:11px;margin-top:5px}
+.jup-teach{background:#1a2859;border:2px solid #a8d9ff;border-radius:20px;padding:15px;margin:12px 0;font-size:19px;line-height:1.45}
+.jup-question{font-size:22px;font-weight:900;margin:16px 0}
+.jup-choices{display:grid;grid-template-columns:1fr 1fr;gap:12px}.jup-choice{min-height:145px;border:3px solid #ffe3a7;border-radius:20px;background:#fff8e9;color:#16213c;font-weight:900;font-size:20px;padding:8px;cursor:pointer}
+.jup-choice:active{transform:scale(.97)}
+.jup-choice svg{width:100%;height:94px;display:block}.jup-progress{font-weight:900;color:#a7e7ff}
+#jupFeedback{min-height:55px;color:#ffe79e;font-size:19px;font-weight:800}
+#jupiterAcademy .jup-ships{grid-template-columns:repeat(2,minmax(0,1fr))}#jupiterAcademy .jup-ship:nth-child(5){background:linear-gradient(145deg,#c36a3c,#672a55)}#jupiterAcademy .jup-ship:nth-child(6){background:linear-gradient(145deg,#6d5bc9,#27336c)}
+</style><style>#launch{position:fixed;inset:0;z-index:2000;background:#020817;display:none;align-items:center;justify-content:center}#launch.active{display:flex}#launch video{width:100%;height:100%;object-fit:contain}#skipLaunch{position:absolute;right:18px;bottom:calc(22px + env(safe-area-inset-bottom));z-index:2;background:#ffe68b;color:#102644;padding:12px 20px;border-radius:20px;font-weight:900}</style><style>
+/* V9: self-contained planet illustrations, no broken external images */
+#earth .map .planet[data-world="0"] .orb{background-image:url("images/image_001.png")!important;background-color:transparent!important;background-size:contain!important;background-repeat:no-repeat!important;border:0!important;box-shadow:0 0 16px #7acfff44!important}
+#earth .map .planet[data-world="1"] .orb{background-image:url("images/image_002.png")!important;background-color:transparent!important;background-size:contain!important;background-repeat:no-repeat!important;border:0!important;box-shadow:0 0 16px #7acfff44!important}
+#earth .map .planet[data-world="2"] .orb{background-image:url("images/image_003.png")!important;background-color:transparent!important;background-size:contain!important;background-repeat:no-repeat!important;border:0!important;box-shadow:0 0 16px #7acfff44!important}
+#earth .map .planet[data-world="3"] .orb{background-image:url("images/image_004.png")!important;background-color:transparent!important;background-size:contain!important;background-repeat:no-repeat!important;border:0!important;box-shadow:0 0 16px #7acfff44!important}
+#earth .map .planet[data-world="4"] .orb{background-image:url("images/image_005.png")!important;background-color:transparent!important;background-size:contain!important;background-repeat:no-repeat!important;border:0!important;box-shadow:0 0 16px #7acfff44!important}
+#earth .map .planet[data-world="5"] .orb{background-image:url("images/image_006.png")!important;background-color:transparent!important;background-size:contain!important;background-repeat:no-repeat!important;border:0!important;box-shadow:0 0 16px #7acfff44!important}
+#earth .map .planet[data-world="6"] .orb{background-image:url("images/image_007.png")!important;background-color:transparent!important;background-size:contain!important;background-repeat:no-repeat!important;border:0!important;box-shadow:0 0 16px #7acfff44!important}
+#earth .map .planet[data-world="7"] .orb{background-image:url("images/image_008.png")!important;background-color:transparent!important;background-size:contain!important;background-repeat:no-repeat!important;border:0!important;box-shadow:0 0 16px #7acfff44!important}
+#earth .map .planet[data-world="5"] .orb:after{display:none!important}
+</style><style>
+/* New cartoon-only title screen: image is decorative; only PLAY region is interactive. */
+body:has(#home.active) .top{display:none}
+#home.active{position:fixed;inset:0;z-index:1000;background:#060b2a;display:flex;align-items:center;justify-content:center;margin:0;padding:0;overflow:hidden}
+#home .hero,#home > p{display:none!important}
+#arloSplashFrame{position:relative;width:min(100vw,61.53846dvh);height:min(162.5vw,100dvh);margin:auto}
+#arloSplashImage{width:100%;height:100%;object-fit:fill;display:block}
+#arloSplashPlay{position:absolute;left:24%;top:84.5%;width:52%;height:12%;background:transparent;border:0;border-radius:32%;cursor:pointer;touch-action:manipulation;color:transparent;box-shadow:none;outline-offset:3px}
+#arloSplashPlay:focus-visible{outline:4px solid white}
+#arloSplashPlay:disabled{opacity:1;cursor:default}
+#arloSplashStatus{position:absolute;bottom:1.5%;left:10%;width:80%;text-align:center;color:white;font-weight:800;text-shadow:0 2px 5px #000;pointer-events:none;font-size:clamp(11px,2.5vw,17px)}
+</style></head><body><audio id="arloSoundtrack" loop preload="auto" src="audio/audi_001.mp3"></audio><div id="launch" role="dialog" aria-label="Spaceship launch animation"><video id="launchVideo" playsinline preload="auto" src="videos/video_001.mp4"></video></div><div class="wrap"><div class="top"><div class="brand">🚀 Captain Arlo's Dino Galaxy</div><button class="secondary" id="musicBtn" onclick="toggleMusic()">🎵 Music on</button><button class="secondary" id="soundBtn" onclick="toggleSound()">🔊 Voice on</button></div>
+<section id="home" class="screen active"><div id="arloSplashFrame"><img id="arloSplashImage" alt="Cartoon Captain Arlo with blonde hair and blue eyes, alongside Tilly the blue Triceratops in space" src="images/image_009.png"><button id="arloSplashPlay" type="button" aria-label="Play Captain Arlo’s Dino Galaxy" onclick="arloSplashStart()">Play</button><div id="arloSplashStatus" aria-live="polite"></div></div><div class="hero"><img alt="Captain Arlo and his Triceratops in space" src="images/image_010.png"><div class="card"><h1>Welcome, Captain Arlo!</h1><p class="muted">Your dinosaur buddy is ready for a mathematical space adventure.</p><div id="nameArea"><label for="dino">Name your Triceratops:</label><br><br><input id="dino" maxlength="20" placeholder="Dinosaur name"></div><p id="hello" class="muted"></p><div class="controls"><button class="primary" id="welcomeStartButton" onclick="startGame()">🦖 START WITH TILLY</button><button class="secondary" id="skipTillyIntro" style="display:none" onclick="skipTillyIntro()">Skip introduction ⏭</button></div></div></div><p style="text-align:center;color:#d1e7ff;font-size:13px">🦖 Press START WITH TILLY to hear her introduction, then launch!</p></section>
+<section id="earth" class="screen"><div class="card"><h2>☀️ Solar System Explorer</h2><p class="muted">Tap a floating planet to explore! Earth is ready for your maths adventures.</p><div class="map" id="map"></div></div><div class="card" id="earthMissions" style="margin-top:12px"><h2>🌍 Earth Training Academy</h2><div class="progress"><div class="bar" id="earthbar"></div></div><p id="earthstatus" class="muted"></p><div class="academy-map" aria-label="Choose an Earth Training Academy mission">
+<img class="academy-art" alt="Four colourful adventure continents on Earth" src="images/image_011.png">
+<button class="academy-zone zone-nw" onclick="begin(0)" aria-label="Start Rocket Fuel Multiplication"><span class="academy-label">🚀 ROCKET FUEL<br><strong>MULTIPLICATION</strong><small id="academyProgress0"></small></span></button>
+<button class="academy-zone zone-ne" onclick="begin(1)" aria-label="Start Dinosaur Eggs Division"><span class="academy-label">🥚 DINO EGGS<br><strong>DIVISION</strong><small id="academyProgress1"></small></span></button>
+<button class="academy-zone zone-sw" onclick="begin(2)" aria-label="Start Spaceship Repairs Mental Maths"><span class="academy-label">🛠️ SHIP REPAIRS<br><strong>MENTAL MATHS</strong><small id="academyProgress2"></small></span></button>
+<button class="academy-zone zone-se" onclick="begin(3)" aria-label="Start Mystery Crater Number Puzzles"><span class="academy-label">🌋 MYSTERY CRATER<br><strong>NUMBER PUZZLES</strong><small id="academyProgress3"></small></span></button>
+</div><div class="missions" id="missions" style="display:none"></div></div></section>
+<section id="marsAcademy" class="screen"><div class="card"><h2>🔴 Mars Training Academy</h2><p>Tap any of the four Martian continents to start a word search!</p><div class="mars-map">
+<div class="mars-sky">✦　　🪐　✧　　✦　　🚀　✧</div>
+<button class="mars-land mars-a" onclick="startMars(0)">🚀<br>ROCKET RESCUE<small>Mission 1</small></button>
+<button class="mars-land mars-b" onclick="startMars(1)">🦖<br>DINO HUNT<small>Mission 2</small></button>
+<button class="mars-land mars-c" onclick="startMars(2)">🛸<br>MARTIAN EXPLORER<small>Mission 3</small></button>
+<button class="mars-land mars-d" onclick="startMars(3)">👽<br>ALIEN ADVENTURE<small>Mission 4</small></button>
+</div><p id="marsProgressText"></p><button class="secondary" onclick="show('earth')">← Solar System</button></div></section>
+<section id="marsWords" class="screen"><div class="card mars-game"><h2 id="marsTitle"></h2><img class="mars-portrait-characters" alt="Blonde Captain Arlo and Tilly the Triceratops exploring Mars" src="images/image_012.webp"><p id="marsInstructions">Find all six words! Drag across the letters — some go across and some go down!</p><div class="mars-puzzle-layout"><div><div id="marsGrid" class="mars-grid"></div><div id="marsMessage" aria-live="polite"></div></div><div class="mars-words"><h3>🔎 Words to find</h3><div id="marsWordList"></div><p id="marsCount"></p></div></div><div class="controls"><button class="primary" onclick="marsHint()">💡 Hint</button><button class="secondary" onclick="resetMarsPuzzle()">↻ Restart</button><button class="secondary" onclick="show('marsAcademy')">← Mars Map</button></div></div></section><section id="jupiterAcademy" class="screen"><div class="jup-wrap"><h1>🪐 JUPITER ACADEMY</h1><p>Four spaceships • Four gentle fraction adventures</p><div class="jup-ships">
+<button onclick="startJupiter(0)" class="jup-ship">🚀<strong>HALFWAY HERO</strong><small>Spaceship 1 • Halves</small></button>
+<button onclick="startJupiter(1)" class="jup-ship">🛸<strong>QUARTER QUEST</strong><small>Spaceship 2 • Quarters</small></button>
+<button onclick="startJupiter(2)" class="jup-ship">🚀<strong>FRACTION FACTORY</strong><small>Spaceship 3 • Recognise</small></button>
+<button onclick="startJupiter(3)" class="jup-ship">🛸<strong>FRACTION RESCUE</strong><small>Spaceship 4 • Practice</small></button>
+<button onclick="startJupiter(4)" class="jup-ship">🚀<strong>THIRDS EXPLORER</strong><small>Spaceship 5 • Thirds</small></button>
+<button onclick="startJupiter(5)" class="jup-ship">🛸<strong>FRACTION CHALLENGE</strong><small>Spaceship 6 • Compare</small></button>
+</div><p id="jupiterProgress"></p><button class="secondary" onclick="show('map')">← Solar System</button></div></section>
+<section id="jupiterLesson" class="screen"><div class="jup-wrap"><h2 id="jupMissionTitle"></h2><div class="jup-progress" id="jupStep"></div><div class="jup-teach" id="jupTeach"></div><div id="jupQuestion" class="jup-question"></div><div id="jupChoices" class="jup-choices"></div><p id="jupFeedback" aria-live="polite"></p><div class="controls"><button class="secondary" onclick="jupSpeak()">🔊 Hear Tilly</button><button class="secondary" onclick="show('jupiterAcademy');renderJupiterProgress()">← Spaceships</button></div></div></section>
+<section id="play" class="screen"><div class="layout"><div class="card"><div class="top"><span id="missiontitle" class="pill"></span><span id="count" class="pill"></span></div><div class="question" id="question"></div><div class="progress"><div class="bar" id="qbar"></div></div><p class="muted" id="prompt">Type your answer on the space tablet.</p><div class="feedback" id="feedback" aria-live="polite"></div><div class="controls"><button class="secondary" onclick="speakQuestion()">🔊 Hear question</button><button class="secondary" onclick="show('earth')">⏸ Save & exit</button></div></div><div class="pad"><div class="dino-sky" aria-hidden="true"><div class="dino-float"><span>🦖</span><span class="helmet"></span></div><div class="dino-float"><span>🦕</span><span class="helmet"></span></div><div class="dino-float"><span>🦖</span><span class="helmet"></span></div><div class="dino-float"><span>🦕</span><span class="helmet"></span></div></div><div style="text-align:center;font-weight:900;color:#bceaff">✦ SPACE CONTROL TABLET ✦</div><div class="answer" id="answer">_</div><div class="keys" id="keys"></div></div></div></section>
+<section id="done" class="screen"><div class="card" style="text-align:center;margin-top:25px"><h1>🌟 Mission Complete!</h1><p id="doneText"></p><button class="primary" onclick="show('earth')">🪐 Back to Earth Map</button></div></section><div class="footer">Private offline prototype • Progress stays on this device • No adverts or accounts</div></div>
+<script>
+let launchFinished=false;
+function finishLaunch(){if(launchFinished)return;launchFinished=true;const v=document.getElementById('launchVideo');v.pause();v.currentTime=0;document.getElementById('launch').classList.remove('active');document.body.style.overflow='';if(musicOn)startMusic();show('earth')}
+function playLaunch(){if(welcomeNarrationStarted)return;launchFinished=false;const panel=document.getElementById('launch'),v=document.getElementById('launchVideo');document.getElementById('home').classList.remove('active');panel.classList.add('active');document.body.style.overflow='hidden';document.getElementById('arloSoundtrack').pause();v.currentTime=0;v.muted=false;const result=v.play();if(result&&result.catch)result.catch(()=>{v.muted=true;v.play().catch(()=>finishLaunch())})}
+document.getElementById('launchVideo').addEventListener('ended',finishLaunch);
+document.getElementById('launchVideo').addEventListener('error',finishLaunch);
+
+const tillyMathClips={"Multiplication_0":"audio/audi_002.mp3","Multiplication_1":"audio/audi_003.mp3","Multiplication_2":"audio/audi_004.mp3","Multiplication_3":"audio/audi_005.mp3","Multiplication_4":"audio/audi_006.mp3","Multiplication_5":"audio/audi_007.mp3","Multiplication_6":"audio/audi_008.mp3","Multiplication_7":"audio/audi_009.mp3","Multiplication_8":"audio/audi_010.mp3","Multiplication_9":"audio/audi_011.mp3","Multiplication_10":"audio/audi_012.mp3","Multiplication_11":"audio/audi_013.mp3","Division_0":"audio/audi_014.mp3","Division_1":"audio/audi_015.mp3","Division_2":"audio/audi_016.mp3","Division_3":"audio/audi_017.mp3","Division_4":"audio/audi_018.mp3","Division_5":"audio/audi_019.mp3","Division_6":"audio/audi_020.mp3","Division_7":"audio/audi_021.mp3","Division_8":"audio/audi_022.mp3","Division_9":"audio/audi_023.mp3","Division_10":"audio/audi_024.mp3","Division_11":"audio/audi_025.mp3","MentalMaths_0":"audio/audi_026.mp3","MentalMaths_1":"audio/audi_027.mp3","MentalMaths_2":"audio/audi_028.mp3","MentalMaths_3":"audio/audi_029.mp3","MentalMaths_4":"audio/audi_030.mp3","MentalMaths_5":"audio/audi_031.mp3","MentalMaths_6":"audio/audi_032.mp3","MentalMaths_7":"audio/audi_033.mp3","MentalMaths_8":"audio/audi_034.mp3","MentalMaths_9":"audio/audi_035.mp3","MentalMaths_10":"audio/audi_036.mp3","MentalMaths_11":"audio/audi_037.mp3","NumberPuzzles_0":"audio/audi_038.mp3","NumberPuzzles_1":"audio/audi_039.mp3","NumberPuzzles_2":"audio/audi_040.mp3","NumberPuzzles_3":"audio/audi_041.mp3","NumberPuzzles_4":"audio/audi_042.mp3","NumberPuzzles_5":"audio/audi_043.mp3","NumberPuzzles_6":"audio/audi_044.mp3","NumberPuzzles_7":"audio/audi_045.mp3","NumberPuzzles_8":"audio/audi_046.mp3","NumberPuzzles_9":"audio/audi_047.mp3","NumberPuzzles_10":"audio/audi_048.mp3","NumberPuzzles_11":"audio/audi_049.mp3","Reaction_0":"audio/audi_050.mp3","Reaction_1":"audio/audi_051.mp3","Reaction_2":"audio/audi_052.mp3","Reaction_3":"audio/audi_053.mp3","Reaction_4":"audio/audi_054.mp3","Reaction_5":"audio/audi_055.mp3","Reaction_6":"audio/audi_056.mp3","Reaction_7":"audio/audi_057.mp3"};
+const tillyKeys=['Multiplication','Division','MentalMaths','NumberPuzzles'];
+let mathVoice=null,mathToken=0,mathIntroDone=[false,false,false,false];
+function stopMathVoice(){mathToken++;if(mathVoice){mathVoice.pause();mathVoice=null}}
+function playMathClip(key,done){
+ stopMathVoice();if(!sound){if(done)done();return}
+ if('speechSynthesis' in window)speechSynthesis.cancel();
+ const token=mathToken,a=new Audio(tillyMathClips[key]);mathVoice=a;
+ const music=document.getElementById('arloSoundtrack');if(music)music.volume=.07;
+ const end=()=>{if(token!==mathToken)return;mathVoice=null;if(music)music.volume=.23;if(done)done()};
+ a.onended=end;a.onerror=end;a.play().catch(end);
+}
+function mathQuestion(){let p=state.position[stage];if(p<10)playMathClip(tillyKeys[stage]+'_'+(p+1))}
+const Q=[[["7 \u00d7 9", 63], ["8 \u00d7 6", 48], ["9 \u00d7 4", 36], ["6 \u00d7 7", 42], ["12 \u00d7 3", 36], ["8 \u00d7 8", 64], ["11 \u00d7 7", 77], ["9 \u00d7 9", 81], ["12 \u00d7 6", 72], ["7 \u00d7 8", 56]], [["36 \u00f7 6", 6], ["56 \u00f7 7", 8], ["81 \u00f7 9", 9], ["48 \u00f7 8", 6], ["72 \u00f7 9", 8], ["63 \u00f7 7", 9], ["96 \u00f7 12", 8], ["84 \u00f7 7", 12], ["108 \u00f7 9", 12], ["144 \u00f7 12", 12]], [["25 + 17", 42], ["48 + 36", 84], ["100 \u2212 37", 63], ["75 \u2212 28", 47], ["125 + 50", 175], ["200 \u2212 75", 125], ["99 + 99", 198], ["150 \u2212 65", 85], ["250 + 125", 375], ["500 \u2212 175", 325]], [["5, 10, 15, 20, ?", 25], ["Double 35", 70], ["Half of 90", 45], ["3, 6, 12, 24, ?", 48], ["10 \u00d7 10", 100], ["100 \u00f7 4", 25], ["7 squared", 49], ["1,000 \u2212 250", 750], ["12 \u00d7 12", 144], ["Half of 1,000", 500]]];const titles=['Rocket Fuel · Multiplication','Dinosaur Eggs · Division','Spaceship Repairs · Mental Maths','Mystery Crater · Number Puzzles'];const planets=[['Mercury','☿'],['Venus','♀'],['Earth','🌍'],['Mars','🔴'],['Jupiter','🟠'],['Saturn','🪐'],['Uranus','🔵'],['Neptune','🔵']];const facts=['Mercury is closest to the Sun.','Venus is the hottest planet.','Earth is the third planet from the Sun.','Mars is the fourth planet from the Sun.','Jupiter is the biggest planet.','Saturn is famous for its rings.','Uranus spins on its side.','Neptune is the farthest planet from the Sun.'];let state;try{state=JSON.parse(localStorage.getItem('arlo_dino_v1'))||{dino:'',completed:[false,false,false,false],position:[0,0,0,0]}}catch(e){state={dino:'',completed:[false,false,false,false],position:[0,0,0,0]}};let stage=0,entry='',sound=true,busy=false;let musicOn=true,audioCtx=null,musicTimer=null,musicStep=0;
+
+function tone(freq,when,duration=.2,volume=.04,type='sawtooth'){
+ if(!audioCtx)return;
+ let o=audioCtx.createOscillator(),g=audioCtx.createGain();
+ o.type=type;o.frequency.setValueAtTime(Math.max(30,freq),when);
+ g.gain.setValueAtTime(.0001,when);g.gain.exponentialRampToValueAtTime(Math.max(.0002,volume),when+.015);
+ g.gain.exponentialRampToValueAtTime(.0001,when+duration);
+ o.connect(g);g.connect(audioCtx.destination);o.start(when);o.stop(when+duration+.02);
+ return o;
+}
+// Cinematic, slowly evolving space score: soft pads, deep bass and sparkling arpeggios.
+function spaceVoice(freq,when,duration,volume=.012){
+ if(!audioCtx)return;
+ const o=audioCtx.createOscillator(),g=audioCtx.createGain(),f=audioCtx.createBiquadFilter();
+ o.type='sine';o.frequency.value=freq;f.type='lowpass';f.frequency.value=1250;
+ g.gain.setValueAtTime(.00001,when);g.gain.linearRampToValueAtTime(volume,when+.45);
+ g.gain.setValueAtTime(volume,when+Math.max(.46,duration-.7));g.gain.exponentialRampToValueAtTime(.00001,when+duration);
+ o.connect(f);f.connect(g);g.connect(audioCtx.destination);o.start(when);o.stop(when+duration+.03);
+}
+function musicTick(){
+ if(!musicOn||!audioCtx)return;
+ const chords=[[130.81,164.81,196,261.63],[110,146.83,174.61,220],[87.31,130.81,174.61,261.63],[98,146.83,196,293.66]];
+ const i=musicStep++, chord=chords[Math.floor(i/8)%chords.length], t=audioCtx.currentTime;
+ const playing=document.getElementById('play').classList.contains('active'),v=playing?.45:1;
+ if(i%8===0){chord.forEach((n,k)=>spaceVoice(n,t,4.1,(k===0?.017:.009)*v));spaceVoice(chord[0]/2,t,4.0,.019*v)}
+ // Distant twinkling stars, not a bouncy arcade melody.
+ if(i%2===0){const n=chord[[2,3,1,3][Math.floor(i/2)%4]]*2;spaceVoice(n,t,.9,.006*v)}
+}
+function startMusic(){
+ const track=document.getElementById('arloSoundtrack');
+ if(!musicOn||document.getElementById('launch').classList.contains('active'))return;
+ track.volume=.23;
+ const result=track.play();if(result&&result.catch)result.catch(()=>{});
+}
+function toggleMusic(){musicOn=!musicOn;document.getElementById('musicBtn').textContent=musicOn?'🎵 Music on':'🔇 Music off';if(musicOn)startMusic();else document.getElementById('arloSoundtrack').pause()}
+function rocketWhoosh(){
+ startMusic();if(!audioCtx)return;
+ let t=audioCtx.currentTime;
+ for(let i=0;i<15;i++){let o=tone(85+i*37,t+i*.035,.14,.025,'sawtooth');if(o)o.frequency.exponentialRampToValueAtTime(130+i*50,t+i*.035+.13)}
+}
+function fanfare(){startMusic();if(!audioCtx)return;let t=audioCtx.currentTime;[392,523.25,659.25,783.99,1046.5].forEach((n,i)=>{tone(n,t+i*.14,i===4?.65:.23,.055,'sawtooth');tone(n/2,t+i*.14,i===4?.65:.23,.022,'triangle')})}
+function cartoonBoom(){startMusic();if(!audioCtx)return;let t=audioCtx.currentTime;for(let i=0;i<12;i++){let o=tone(330-i*23,t+i*.035,.24,.06,'sawtooth');if(o)o.frequency.exponentialRampToValueAtTime(42,t+i*.035+.22)}}
+function save(){try{localStorage.setItem('arlo_dino_v1',JSON.stringify(state))}catch(e){}}function show(id){if('speechSynthesis' in window)speechSynthesis.cancel();document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active',s.id===id));if(id==='earth')renderMap()}function chooseExplorerVoice(){
+ const voices=speechSynthesis.getVoices();
+ const english=voices.filter(v=>/^en[-_]/i.test(v.lang));
+ // Prioritize youthful-sounding English voices where the device supplies them.
+ return english.find(v=>/child|kid|junior|young|boy/i.test(v.name))
+ ||english.find(v=>/male|daniel|oliver|ryan|george|arthur/i.test(v.name))
+ ||english.find(v=>/en-GB/i.test(v.lang))||english[0]||null;
+}
+function say(s){
+ return; // Legacy phone narration disabled; Tilly MP3 is authoritative.
+ if(!sound||!('speechSynthesis'in window))return;
+ try{speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(s);
+ const voice=chooseExplorerVoice();if(voice)u.voice=voice;
+ u.rate=1.12;u.pitch=1.48;u.volume=1;
+ speechSynthesis.speak(u)}catch(e){}
+}
+function toggleSound(){sound=!sound;if(!sound)stopCadet();document.getElementById('soundBtn').textContent=sound?'🔊 Voice on':'🔇 Voice off';if(!sound&&'speechSynthesis'in window)speechSynthesis.cancel()}let welcomeNarrationStarted=false;
+function startGame(){
+ if(welcomeNarrationStarted)return;
+ welcomeNarrationStarted=true;
+ let val=document.getElementById('dino').value.trim();
+ if(!state.dino){state.dino=val||'Dino';save()}
+ document.getElementById('nameArea').style.display='none';
+ document.getElementById('hello').textContent='Tilly is ready for your adventure!';
+ const btn=document.getElementById('welcomeStartButton');
+ if(btn){btn.textContent='🦖 TILLY IS TALKING...';btn.disabled=true}
+ const skip=document.getElementById('skipTillyIntro');
+ if(skip)skip.style.display='none';
+ const track=document.getElementById('arloSoundtrack');
+ if(track)track.pause();
+ const launchAfterIntro=()=>{
+   if(!welcomeNarrationStarted)return;
+   welcomeNarrationStarted=false;
+   stopCadet();
+   if(skip)skip.style.display='none';
+   if(btn){btn.disabled=false;btn.textContent='🚀 START ADVENTURE'}
+   const status=document.getElementById('arloSplashStatus');if(status)status.textContent='Launching spaceship…';
+   playLaunch();
+ };
+ try{
+  if('speechSynthesis' in window)speechSynthesis.cancel();
+  const a=new Audio(cadetAudioSources.Intro);
+  cadetAudio=a;
+  a.onended=launchAfterIntro;
+  a.onerror=()=>{if(btn){btn.disabled=false;btn.textContent='🚀 CONTINUE ADVENTURE'};welcomeNarrationStarted=false;};
+  const result=a.play();
+  if(result&&result.catch)result.catch(()=>{welcomeNarrationStarted=false;if(btn){btn.disabled=false;btn.textContent='▶ PLAY TILLY’S INTRO'};});
+ }catch(e){welcomeNarrationStarted=false;if(btn){btn.disabled=false;btn.textContent='▶ PLAY TILLY’S INTRO'}}
+}
+function skipTillyIntro(){if(welcomeNarrationStarted){welcomeNarrationStarted=false;stopCadet();document.getElementById('skipTillyIntro').style.display='none';playLaunch()}}
+;if(state.dino){document.getElementById('nameArea').style.display='none';document.getElementById('hello').textContent='Welcome back! Tilly is waiting.'}
+const discoveryFacts=[["Mercury is the closest planet to the Sun!", "Mercury is the smallest planet in our solar system.", "A year on Mercury lasts just 88 Earth days!", "Mercury has lots of craters, like our Moon.", "Mercury has almost no air to breathe.", "Mercury can be extremely hot in the daytime.", "At night, Mercury gets freezing cold!", "Mercury has no moons at all.", "Mercury is a rocky planet.", "A day from sunrise to sunrise on Mercury lasts 176 Earth days!"], ["Venus is the hottest planet in our solar system!", "Venus is covered by thick clouds.", "Venus is almost as big as Earth.", "Venus spins in the opposite direction to most planets.", "One day on Venus is longer than its year!", "Venus has no moons.", "Venus is the second planet from the Sun.", "Venus has mountains and volcanoes.", "The clouds of Venus hide its surface from view.", "Venus is sometimes called Earth’s sister planet."], ["Earth is our home planet!", "Earth has oceans full of water.", "Earth has one Moon.", "Earth takes about 365 days to go around the Sun.", "Earth spins once in about 24 hours.", "Earth is the third planet from the Sun.", "Earth has air that people and animals can breathe.", "Most of Earth’s surface is covered by water.", "Earth has forests, deserts, mountains, and ice.", "Earth is the only planet where we know life exists!"], ["Mars is known as the Red Planet!", "Mars has two tiny moons, Phobos and Deimos.", "Mars has the tallest volcano in the solar system!", "Robots called rovers have explored Mars.", "Mars is colder than Earth.", "Mars has dusty deserts and giant canyons.", "A day on Mars is a little longer than a day on Earth.", "Mars is the fourth planet from the Sun.", "Mars looks red because of rusty iron in its dust.", "Scientists are searching for clues about ancient water on Mars."], ["Jupiter is the biggest planet in our solar system!", "Jupiter is a giant planet made mostly of gas.", "Jupiter has a huge storm called the Great Red Spot.", "Jupiter has many moons.", "One of Jupiter’s moons is called Europa.", "Jupiter has faint rings.", "Jupiter spins very quickly!", "Jupiter is the fifth planet from the Sun.", "Jupiter has colorful bands of clouds.", "Jupiter is so big that more than 1,000 Earths could fit inside its volume!"], ["Saturn is famous for its beautiful rings!", "Saturn’s rings are made mostly of pieces of ice.", "Saturn is a giant planet made mostly of gas.", "Saturn is the sixth planet from the Sun.", "Saturn has many moons.", "Titan is Saturn’s largest moon.", "Saturn is less dense than water!", "Saturn has strong winds.", "Saturn’s rings are incredibly wide but very thin.", "Saturn takes about 29 Earth years to orbit the Sun."], ["Uranus is a pale blue-green planet!", "Uranus spins tipped over on its side.", "Uranus is an ice giant.", "Uranus is the seventh planet from the Sun.", "Uranus has rings, but they are hard to see.", "Uranus is very, very cold.", "Uranus has many moons.", "Methane gas helps give Uranus its blue-green color.", "Uranus takes about 84 Earth years to orbit the Sun.", "Uranus was the first planet discovered using a telescope."], ["Neptune is the farthest planet from the Sun!", "Neptune is a deep blue ice giant.", "Neptune has some of the fastest winds in the solar system.", "Neptune is very cold.", "Neptune has faint rings.", "Neptune has a large moon called Triton.", "Neptune takes about 165 Earth years to orbit the Sun.", "Neptune is the eighth planet from the Sun.", "Neptune was discovered with help from mathematics!", "Neptune is so far away that sunlight takes about four hours to reach it."]];
+const embeddedPlanetArt=["images/image_013.png", "images/image_014.png", "images/image_015.png", "images/image_016.png", "images/image_017.png", "images/image_018.png", "images/image_019.png", "images/image_020.png"];let discoveryIndex=-1;const discoveryPositions=Array(8).fill(0);
+const cadetAudioSources={"Intro":"audio/audi_058.mp3","Mercury":"audio/audi_059.mp3","Venus":"audio/audi_060.mp3","Earth":"audio/audi_061.mp3","Mars":"audio/audi_062.mp3","Jupiter":"audio/audi_063.mp3","Saturn":"audio/audi_064.mp3","Uranus":"audio/audi_065.mp3","Neptune":"audio/audi_066.mp3"};
+
+let cadetAudio=null;
+function stopCadet(){if(cadetAudio){cadetAudio.pause();cadetAudio.currentTime=0;cadetAudio=null}const track=document.getElementById('arloSoundtrack');if(track)track.volume=.23}
+function playCadet(name){stopCadet();if(!sound)return;try{if('speechSynthesis'in window)speechSynthesis.cancel();const track=document.getElementById('arloSoundtrack');if(track)track.volume=.07;const a=new Audio(cadetAudioSources[name]);cadetAudio=a;a.onended=()=>{if(cadetAudio===a)stopCadet()};a.onerror=()=>{if(cadetAudio===a)stopCadet()};a.play().catch(()=>stopCadet())}catch(e){stopCadet()}}
+const cadetFacts=[
+["Mercury is the smallest planet in our Solar System.","It is the closest planet to the Sun.","Mercury is covered in thousands of craters.","Its days can be hotter than an oven.","Its nights are incredibly cold.","One Mercury year lasts just 88 Earth days."],
+["Venus is the hottest planet in our Solar System.","Thick clouds trap heat like a giant blanket.","Venus is nearly the same size as Earth.","Its atmosphere is extremely hot and crushing.","Venus spins backwards compared with most planets.","One full spin on Venus takes longer than its year."],
+["Earth is the only planet where we know life exists.","About seventy percent of Earth's surface is covered in water.","Earth has one Moon.","Earth takes about 365 days to orbit the Sun.","Earth's magnetic field helps protect us from space particles.","Earth is home to millions of kinds of living things; dinosaurs lived here long ago."],
+["Mars is red because its dusty surface contains rusty iron.","Olympus Mons is the tallest known volcano in the Solar System.","Mars has two small moons: Phobos and Deimos.","Robot rovers explore Mars and take pictures.","A day on Mars lasts about 24 hours and 39 minutes.","Long ago, Mars had rivers and lakes."],
+["Jupiter is the biggest planet in our Solar System.","More than 1,300 Earths could fit inside Jupiter by volume.","Jupiter is made mostly of gas.","The Great Red Spot is a giant storm.","A day on Jupiter lasts about ten hours.","Its moon Ganymede is bigger than Mercury."],
+["Saturn is the second-biggest planet in our Solar System.","Its rings contain billions of pieces of ice, rock and dust.","Ring pieces range from tiny grains to enormous chunks.","Saturn is less dense than water.","Its moon Titan has lakes of liquid methane.","Saturn takes nearly 29 and a half Earth years to orbit the Sun."],
+["Uranus is a very cold ice giant.","Methane in its atmosphere gives it a blue-green colour.","Uranus spins almost on its side.","Uranus has dark, faint rings.","One year on Uranus lasts 84 Earth years.","Its atmosphere reaches some of the coldest temperatures of any planet."],
+["Neptune is the farthest planet from the Sun.","Neptune is a freezing-cold ice giant.","Its winds can exceed 1,000 miles per hour.","One year on Neptune lasts about 165 Earth years.","Its moon Triton orbits backwards compared with Neptune's rotation.","Scientists predicted Neptune using mathematics before observing it through a telescope."]
+];
+const allPlanetVideos=[
+'videos/video_002.mp4',
+'videos/video_003.mp4',
+'videos/video_004.mp4',
+'videos/video_005.mp4',
+'videos/video_006.mp4',
+'videos/video_007.mp4',
+'videos/video_008.mp4',
+'videos/video_009.mp4'
+];
+const DEVELOPER_MODE=true;
+let developerPlanet=2;
+function openDiscovery(i){
+ developerPlanet=i;
+ discoveryIndex=i;
+ document.getElementById('planetDiscovery').classList.add('open');
+ const dev=document.getElementById('devAcademyButton');if(dev)dev.textContent='🛠 Test '+planets[i][0]+' Academy';
+ const v=document.getElementById('discoveryVideo');
+ v.pause();v.src=allPlanetVideos[i];v.currentTime=0;v.loop=true;v.muted=true;
+ v.play().catch(()=>{});
+ playCadet(planets[i][0]);
+}
+function closeDiscovery(){
+ document.getElementById('planetDiscovery').classList.remove('open');
+ const v=document.getElementById('discoveryVideo');v.pause();v.removeAttribute('src');v.load();
+ discoveryIndex=-1;stopCadet();
+}
+function openDeveloperAcademy(){closeDiscovery();if(developerPlanet===3){show('marsAcademy');renderMarsProgress();return;}if(developerPlanet===4){show('jupiterAcademy');renderJupiterProgress();return;}show('earth');const status=document.getElementById('earthstatus');if(status&&developerPlanet!==2)status.textContent='🛠 Developer Mode — '+planets[developerPlanet][0]+' academy preview (Earth missions used as placeholders).';}
+function renderMap(){let map=document.getElementById('map');map.innerHTML='';
+const spots=[[16,15],[49,12],[80,22],[29,37],[70,44],[17,66],[51,70],[83,81]];
+const colors=['Mercury','Venus','Earth','Mars','Jupiter','Saturn','Uranus','Neptune'];
+planets.forEach(([name,icon],i)=>{let b=document.createElement('button');b.className='planet'+(i===2?' selected':'');b.dataset.world=i;b.style.setProperty('--x',spots[i][0]+'%');b.style.setProperty('--y',spots[i][1]+'%');b.style.setProperty('--speed',(4+i%4*1.1)+'s');b.setAttribute('aria-label','Explore '+name);b.innerHTML='<span class="orb" aria-hidden="true"></span><span class="planet-label">'+name+'</span>';b.querySelector('.orb').style.backgroundImage='url("'+embeddedPlanetArt[i]+'")';b.onclick=()=>openDiscovery(i);map.appendChild(b)});
+for(let i=0;i<3;i++){let r=document.createElement('span');r.className='space-rocket';r.textContent='🚀';r.setAttribute('aria-hidden','true');r.style.setProperty('--ry',[9,51,85][i]+'%');r.style.setProperty('--rd',(16+i*5)+'s');r.style.setProperty('--delay',(-i*8)+'s');map.appendChild(r)}
+let completed=state.completed.filter(Boolean).length;document.getElementById('earthbar').style.width=completed*25+'%';document.getElementById('earthstatus').textContent=completed===4?'Earth complete! Mars is our next development stage.':completed+' of 4 Earth missions complete. Finish all four to travel to Mars.';for(let i=0;i<4;i++){let el=document.getElementById('academyProgress'+i);if(el)el.textContent=state.completed[i]?'⭐ Completed — replay':state.position[i]+'/10 completed'}let box=document.getElementById('missions');box.innerHTML='';titles.forEach((title,i)=>{let b=document.createElement('button');b.className='mission';b.innerHTML='<b>'+(state.completed[i]?'⭐ ':'🛰️ ')+(i+1)+'. '+title+'</b><small>'+(state.completed[i]?'Completed — replay anytime':state.position[i]+'/10 questions completed')+'</small>';b.onclick=()=>begin(i);box.appendChild(b)})}function begin(i){startMusic();stage=i;entry='';busy=false;show('play');renderQuestion();
+ if(state.position[stage]===0&&!mathIntroDone[i]){mathIntroDone[i]=true;playMathClip(tillyKeys[i]+'_0',()=>{if(stage===i&&document.getElementById('play').classList.contains('active'))mathQuestion()})}
+ else mathQuestion()}
+function renderQuestion(){let pos=state.position[stage];if(pos>=10){finish();return}document.getElementById('missiontitle').textContent=titles[stage];document.getElementById('count').textContent='Question '+(pos+1)+' / 10';document.getElementById('question').textContent=Q[stage][pos][0]+' = ?';document.getElementById('qbar').style.width=(pos*10)+'%';document.getElementById('feedback').textContent='';entry='';updateEntry()}function speakQuestion(){mathQuestion()}
+function updateEntry(){document.getElementById('answer').textContent=entry||'_'}function tap(v){if(busy)return;if(v==='del')entry=entry.slice(0,-1);else if(v==='go'){check();return}else if(entry.length<6)entry+=v;updateEntry()}function check(){
+ if(!entry||busy)return;
+ let pos=state.position[stage],correct=Q[stage][pos][1],right=Number(entry)===correct;
+ busy=true;stopMathVoice();rocketWhoosh();
+ document.getElementById('feedback').textContent=right?'🚀 Woohoo! You did it! ⭐':'💥 Oops! Rocket malfunction — try again!';
+ setTimeout(()=>{if(right)fanfare();else cartoonBoom()},620);
+ playMathClip('Reaction_'+(right?(pos%4):(4+pos%3)),()=>{
+  if(right){state.position[stage]++;save();busy=false;renderQuestion();if(state.position[stage]<10)mathQuestion()}
+  else{entry='';updateEntry();busy=false}
+ });
+}
+function finish(){playMathClip(tillyKeys[stage]+"_11");fanfare();state.completed[stage]=true;save();document.getElementById('doneText').textContent='Fantastic work, Captain Arlo! You and Tilly completed '+titles[stage]+'. '+(state.completed.every(Boolean)?'All four Earth missions complete! Next stop: Mars!':'Choose another Earth mission.');show('done')}const keys=document.getElementById('keys');['1','2','3','4','5','6','7','8','9','⌫','0','✓ LAUNCH ANSWER'].forEach(v=>{let b=document.createElement('button');b.className='key'+(v==='⌫'?' action':'')+(v.startsWith('✓')?' launch':'');b.textContent=v;b.onclick=()=>tap(v==='⌫'?'del':v.startsWith('✓')?'go':v);keys.appendChild(b)});document.addEventListener('keydown',e=>{if(!document.getElementById('play').classList.contains('active'))return;if(/^\d$/.test(e.key))tap(e.key);if(e.key==='Backspace')tap('del');if(e.key==='Enter')tap('go')});
+
+const marsMissions=[
+ {title:'🚀 Rocket Rescue',words:['SUN','SKY','RED','MAP','JET','FLY']},
+ {title:'🦖 Tilly’s Dino Hunt',words:['CAT','DOG','EGG','BIG','HAT','RUN']},
+ {title:'🛸 Martian Explorer',words:['MARS','STAR','MOON','ROCK','DUST','ROVER']},
+ {title:'👽 Alien Adventure',words:['ALIEN','SPACE','ROCKET','LASER','SHIP','PLANET']}
+];
+let marsStage=0,marsFound=[],marsPointerStart=null,marsPointerCurrent=null;
+let marsProgress;try{marsProgress=JSON.parse(localStorage.getItem('arlo_mars_words_v1'))||[false,false,false,false]}catch(e){marsProgress=[false,false,false,false]}
+const marsGrids=[{"width":8,"rows":["JGFLXNCD","MLZHMKRW","AQQTJJET","POIXCZDB","JKNSUNKE","CTNKONKY","TFLYAKEW","WCMATXHA"],"paths":{"SUN":[[4,3],[4,4],[4,5]],"SKY":[[4,3],[5,3],[6,3]],"RED":[[1,6],[2,6],[3,6]],"MAP":[[1,0],[2,0],[3,0]],"JET":[[2,5],[2,6],[2,7]],"FLY":[[6,1],[6,2],[6,3]]}},{"width":8,"rows":["SPIDWQXR","FDBFFESP","RUNBIGAH","EVVDOGYO","FYCNHTZF","WQAIUFTP","HATRBGHX","YTNJACLX"],"paths":{"CAT":[[4,2],[5,2],[6,2]],"DOG":[[3,3],[3,4],[3,5]],"EGG":[[1,5],[2,5],[3,5]],"BIG":[[2,3],[2,4],[2,5]],"HAT":[[6,0],[6,1],[6,2]],"RUN":[[2,0],[2,1],[2,2]]}},{"width":9,"rows":["KTVMARSIG","KLLIMOONA","VYSCGVTUQ","WLGFTEFWZ","DUSTAROCK","DHYNQMDNA","IZXQZPNAC","GRQCOUJGZ","GCBSXZYRW"],"paths":{"MARS":[[0,3],[0,4],[0,5],[0,6]],"STAR":[[4,2],[4,3],[4,4],[4,5]],"MOON":[[1,4],[1,5],[1,6],[1,7]],"ROCK":[[4,5],[4,6],[4,7],[4,8]],"DUST":[[4,0],[4,1],[4,2],[4,3]],"ROVER":[[0,5],[1,5],[2,5],[3,5],[4,5]]}},{"width":9,"rows":["GIXYBJGMQ","BNOOKDJCX","ALHSJZLCK","WGPHXRAVP","IZHINOSGR","LNSPACEUS","RZHPPKRVA","SYALIENWD","PLANETZJQ"],"paths":{"ALIEN":[[7,2],[7,3],[7,4],[7,5],[7,6]],"SPACE":[[5,2],[5,3],[5,4],[5,5],[5,6]],"ROCKET":[[3,5],[4,5],[5,5],[6,5],[7,5],[8,5]],"LASER":[[2,6],[3,6],[4,6],[5,6],[6,6]],"SHIP":[[2,3],[3,3],[4,3],[5,3]],"PLANET":[[8,0],[8,1],[8,2],[8,3],[8,4],[8,5]]}}];
+function marsPuzzleData(){return marsGrids[marsStage]}
+function startMars(i){marsStage=i;marsFound=[];show('marsWords');renderMarsPuzzle()}
+function renderMarsPuzzle(){
+ const data=marsPuzzleData(),grid=document.getElementById('marsGrid');grid.style.setProperty('--cols',data.width);grid.innerHTML='';
+ document.getElementById('marsTitle').textContent='🔴 Mars Mission '+(marsStage+1)+' – '+marsMissions[marsStage].title;
+ data.rows.forEach((row,r)=>Array.from(row).forEach((letter,c)=>{
+  let cell=document.createElement('button');cell.className='mars-cell';cell.textContent=letter;cell.dataset.r=r;cell.dataset.c=c;
+  cell.onpointerdown=e=>{e.preventDefault();marsPointerStart=[r,c];marsPointerCurrent=[r,c];try{cell.setPointerCapture(e.pointerId)}catch(_){}marsHighlight()};
+  cell.onpointermove=e=>{if(!marsPointerStart)return;const target=document.elementFromPoint(e.clientX,e.clientY);const hit=target&&target.closest('.mars-cell');if(hit){marsPointerCurrent=[+hit.dataset.r,+hit.dataset.c];marsHighlight()}};
+  cell.onpointerup=e=>{if(marsPointerStart){const target=document.elementFromPoint(e.clientX,e.clientY),hit=target&&target.closest('.mars-cell');if(hit)marsPointerCurrent=[+hit.dataset.r,+hit.dataset.c];marsSelect()}};
+  cell.onclick=()=>{if(marsPointerStart)return;if(!marsPointerCurrent){marsPointerCurrent=[r,c];marsPointerStart=[r,c]}else{marsPointerStart=marsPointerCurrent;marsPointerCurrent=[r,c];marsSelect()}};
+  grid.appendChild(cell);
+ }));
+ marsRefresh();
+}
+function marsLineCells(start,end){
+ if(!start||!end)return [];
+ const [r,c]=start,[r2,c2]=end;
+ if(r!==r2&&c!==c2)return [];
+ const cells=[];let dr=Math.sign(r2-r),dc=Math.sign(c2-c),length=Math.max(Math.abs(r2-r),Math.abs(c2-c));
+ for(let k=0;k<=length;k++)cells.push([r+k*dr,c+k*dc]);return cells;
+}
+function marsHighlight(){
+ document.querySelectorAll('.mars-cell').forEach(el=>el.classList.remove('mars-picked'));
+ marsLineCells(marsPointerStart,marsPointerCurrent).forEach(([r,c])=>{const el=document.querySelector('.mars-cell[data-r="'+r+'"][data-c="'+c+'"]');if(el)el.classList.add('mars-picked')});
+}
+function marsSelect(){
+ const cells=marsLineCells(marsPointerStart,marsPointerCurrent);marsPointerStart=null;marsPointerCurrent=null;
+ if(!cells.length)return;
+ const paths=marsPuzzleData().paths;
+ const word=marsMissions[marsStage].words.find(w=>!marsFound.includes(w)&&JSON.stringify(paths[w])===JSON.stringify(cells));
+ if(word){
+ marsFound.push(word);document.getElementById('marsMessage').textContent='⭐ Brilliant, Captain! You found '+word+'!';
+ if(marsFound.length===6){marsProgress[marsStage]=true;localStorage.setItem('arlo_mars_words_v1',JSON.stringify(marsProgress));document.getElementById('marsMessage').textContent='🏆 Mission complete! All six words found!';fanfare()}
+ }else document.getElementById('marsMessage').textContent='Keep searching, Captain!';
+ marsRefresh();
+}
+function marsRefresh(){
+ const paths=marsPuzzleData().paths;
+ const foundCells=new Set(marsFound.flatMap(w=>paths[w].map(([r,c])=>r+','+c)));
+ document.querySelectorAll('.mars-cell').forEach(el=>{const key=el.dataset.r+','+el.dataset.c;el.classList.toggle('mars-found',foundCells.has(key));el.classList.remove('mars-picked','mars-hint')});
+ document.getElementById('marsWordList').innerHTML=marsMissions[marsStage].words.map(w=>'<div class="mars-word '+(marsFound.includes(w)?'done':'')+'">'+(marsFound.includes(w)?'✓ ':'○ ')+w+'</div>').join('');
+ document.getElementById('marsCount').textContent=marsFound.length+' / 6 found';
+}
+function marsHint(){
+ const data=marsPuzzleData(),word=marsMissions[marsStage].words.find(w=>!marsFound.includes(w));if(!word)return;
+ const [r,c]=data.paths[word][0],el=document.querySelector('.mars-cell[data-r="'+r+'"][data-c="'+c+'"]');
+ if(el){el.classList.add('mars-hint');el.focus()}
+ document.getElementById('marsMessage').textContent='💡 Start here, Captain!';
+}
+function resetMarsPuzzle(){marsFound=[];document.getElementById('marsMessage').textContent='';renderMarsPuzzle()}
+
+const jupTitles=['🚀 Halfway Hero','🛸 Quarter Quest','🏭 Fraction Factory','🌟 Fraction Rescue','🚀 Thirds Explorer','🛸 Fraction Challenge'];
+const jupLessons=[
+ [
+ ['A whole means all of something. This pizza is one whole pizza.','Tap the WHOLE pizza.',[[1,1],[1,2]],0],
+ ['When we cut something into two EQUAL pieces, each piece is a half.','Tap ONE HALF.',[[1,2],[1,1]],0],
+ ['Two halves together make one whole!','Tap the WHOLE pizza.',[[2,2],[1,2]],0],
+ ['Look at the two equal pieces. One piece is called one half.','Tap ONE HALF.',[[1,1],[1,2]],1],
+ ['A half is written like this: ½.','Find ONE HALF.',[[1,2],[1,4]],0],
+ ['You are learning halves!','Find the WHOLE pizza.',[[1,2],[1,1]],1]
+ ],
+ [
+ ['Four EQUAL pieces make quarters. One piece is a quarter.','Tap ONE QUARTER.',[[1,4],[1,2]],0],
+ ['A quarter is written ¼.','Find ONE QUARTER.',[[1,1],[1,4]],1],
+ ['Two quarters make a half.','Tap TWO QUARTERS.',[[2,4],[1,4]],0],
+ ['Four quarters make a whole.','Tap the WHOLE.',[[4,4],[1,4]],0],
+ ['Half of a pizza is bigger than one quarter.','Tap ONE HALF.',[[1,4],[1,2]],1],
+ ['Well done! You know quarters now.','Tap ONE QUARTER.',[[1,4],[2,4]],0]
+ ],
+ [
+ ['Let us practise! Whole means all the pieces.','Find the WHOLE.',[[1,2],[1,1]],1],
+ ['Half means one of two equal pieces.','Find ONE HALF.',[[1,2],[1,4]],0],
+ ['Quarter means one of four equal pieces.','Find ONE QUARTER.',[[1,4],[1,1]],0],
+ ['Two quarters are the same amount as a half.','Find ONE HALF.',[[2,4],[1,2]],1],
+ ['One whole can also be shown as two halves.','Find a WHOLE.',[[2,2],[1,4]],0],
+ ['Great work!','Find ONE QUARTER.',[[1,2],[1,4]],1]
+ ],
+ [
+ ['Tilly needs one whole fuel tank.','Choose ONE WHOLE.',[[1,1],[1,2]],0],
+ ['The engine needs half its fuel.','Choose ONE HALF.',[[1,4],[1,2]],1],
+ ['The shield needs one quarter of its power.','Choose ONE QUARTER.',[[1,4],[2,4]],0],
+ ['Two quarters will repair the lights.','Choose TWO QUARTERS.',[[2,4],[1,4]],0],
+ ['Now we need a whole battery.','Choose ONE WHOLE.',[[2,2],[1,2]],0],
+ ['Final repair! Choose a half.','Choose ONE HALF.',[[1,2],[1,4]],0]
+ ],
+ [
+ ['Three EQUAL pieces make thirds. Each piece is one third.','Tap ONE THIRD.',[[1,3],[1,2]],0],
+ ['One third is written like this: ⅓. It means one out of three equal pieces.','Find ONE THIRD.',[[1,4],[1,3]],1],
+ ['Two of the three equal pieces are called two thirds.','Tap TWO THIRDS.',[[2,3],[1,3]],0],
+ ['Three thirds fill the entire circle. That makes one whole!','Tap ONE WHOLE.',[[3,3],[1,3]],0],
+ ['A half is bigger than one third when the circles are the same size.','Tap ONE HALF.',[[1,3],[1,2]],1],
+ ['Great exploring, Captain! Remember: all the pieces must be equal.','Find TWO THIRDS.',[[1,3],[2,3]],1]
+ ],
+ [
+ ['Let us use everything we have learned!','Find ONE THIRD.',[[1,3],[1,4]],0],
+ ['Which picture shows the bigger amount? One half is bigger than one quarter.','Choose ONE HALF.',[[1,4],[1,2]],1],
+ ['Which picture shows the bigger amount? Two thirds is bigger than one third.','Choose TWO THIRDS.',[[2,3],[1,3]],0],
+ ['Two quarters fill the same amount as one half.','Find TWO QUARTERS.',[[1,4],[2,4]],1],
+ ['A whole has every equal piece filled in.','Choose ONE WHOLE.',[[3,3],[2,3]],0],
+ ['Final challenge! Which is the smaller amount: one third or one half?','Choose ONE THIRD.',[[1,2],[1,3]],1]
+ ]
+];
+let jupMission=0,jupIndex=0,jupLocked=false,jupDone;
+try{jupDone=JSON.parse(localStorage.getItem('arlo_jupiter_v1'))||[false,false,false,false,false,false]}catch(e){jupDone=[false,false,false,false,false,false]}
+jupDone=Array.from({length:6},(_,i)=>Boolean(jupDone[i]));
+function renderJupiterProgress(){document.getElementById('jupiterProgress').textContent=jupDone.filter(Boolean).length+' / 6 spaceships completed • Developer Mode'}
+function startJupiter(i){jupMission=i;jupIndex=0;jupLocked=false;show('jupiterLesson');renderJupiter()}
+function jupPie(n,d){let paths='';for(let i=0;i<d;i++){let a=(i/d)*Math.PI*2-Math.PI/2,b=((i+1)/d)*Math.PI*2-Math.PI/2,x=50+43*Math.cos(a),y=50+43*Math.sin(a),x2=50+43*Math.cos(b),y2=50+43*Math.sin(b);paths+='<path d="M50 50 L'+x+' '+y+' A43 43 0 '+(d===1?1:0)+' 1 '+x2+' '+y2+' Z" fill="'+(i<n?'#ffb348':'#f5e9d9')+'" stroke="#7d4c31" stroke-width="2"/>'}if(d===1)return '<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="43" fill="#ffb348" stroke="#7d4c31" stroke-width="3"/></svg>';return '<svg viewBox="0 0 100 100">'+paths+'</svg>'}
+function renderJupiter(){
+ const l=jupLessons[jupMission][jupIndex];if(!l){jupDone[jupMission]=true;localStorage.setItem('arlo_jupiter_v1',JSON.stringify(jupDone));document.getElementById('jupTeach').textContent='🏆 Spaceship complete! You learned something new!';document.getElementById('jupQuestion').textContent='Brilliant, Captain Arlo!';document.getElementById('jupChoices').innerHTML='<button class="primary" onclick="show(\'jupiterAcademy\');renderJupiterProgress()">Back to the spaceships 🚀</button>';document.getElementById('jupStep').textContent='6 of 6 completed';document.getElementById('jupFeedback').textContent='';return}
+ document.getElementById('jupMissionTitle').textContent=jupTitles[jupMission];document.getElementById('jupStep').textContent='Learning step '+(jupIndex+1)+' of 6';document.getElementById('jupTeach').textContent='🦖 Tilly says: '+l[0];document.getElementById('jupQuestion').textContent=l[1];document.getElementById('jupFeedback').textContent='';
+ document.getElementById('jupChoices').innerHTML=l[2].map(([n,d],i)=>'<button class="jup-choice" onclick="answerJupiter('+i+')">'+jupPie(n,d)+'<span>'+(n===d?'ONE WHOLE':n===1&&d===2?'ONE HALF':n===1&&d===4?'ONE QUARTER':n===2&&d===4?'TWO QUARTERS':n===1&&d===3?'ONE THIRD':n===2&&d===3?'TWO THIRDS':'TWO HALVES')+'</span></button>').join('');
+ jupLocked=false;
+}
+function answerJupiter(i){if(jupLocked)return;const l=jupLessons[jupMission][jupIndex];if(i===l[3]){jupLocked=true;document.getElementById('jupFeedback').textContent='⭐ Brilliant, Captain! Well done!';setTimeout(()=>{jupIndex++;renderJupiter()},1200)}else{document.getElementById('jupFeedback').textContent='🦖 Not quite! Look at the equal pieces. Try again!'}}
+function jupSpeak(){const l=jupLessons[jupMission][jupIndex];if(!l)return;if('speechSynthesis' in window){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(l[0]+' '+l[1]);u.lang='en-GB';u.rate=.83;speechSynthesis.speak(u)}}
+
+// Dedicated, individually recorded Jupiter Mission 6 audio; no timestamp slicing.
+const mission6Sources=["audio/audi_067.mp3", "audio/audi_068.mp3", "audio/audi_069.mp3", "audio/audi_070.mp3", "audio/audi_071.mp3", "audio/audi_072.mp3", "audio/audi_073.mp3", "audio/audi_074.mp3"];
+let mission6Audio=null,mission6Token=0,mission6WaitingNext=false,mission6Ready=false;
+function stopMission6Audio(){mission6Token++;if(mission6Audio){mission6Audio.pause();mission6Audio.onended=null;mission6Audio.onerror=null;mission6Audio=null;}}
+function mission6Buttons(locked){document.querySelectorAll('#jupChoices button').forEach(b=>b.disabled=locked);const next=document.getElementById('mission6Next');if(next)next.disabled=locked;}
+function playMission6Clip(index,finished){
+ stopMission6Audio();const token=mission6Token;
+ const audio=new Audio(mission6Sources[index]);mission6Audio=audio;
+ const done=()=>{if(token!==mission6Token)return;mission6Audio=null;if(finished)finished()};
+ audio.onended=done;audio.onerror=()=>{document.getElementById('jupFeedback').textContent='Audio could not play. Tap Hear Tilly to try again.';done()};
+ audio.play().catch(()=>{if(token!==mission6Token)return;document.getElementById('jupFeedback').textContent='Tap Hear Tilly to play the recording.';mission6Audio=null;});
+}
+const jupStartOriginal=startJupiter;
+startJupiter=function(i){
+ stopMission6Audio();mission6WaitingNext=false;mission6Ready=false;
+ if(i!==5){jupStartOriginal(i);return}
+ jupMission=i;jupIndex=0;show('jupiterLesson');renderJupiter();
+ mission6Buttons(true);document.getElementById('jupFeedback').textContent='Listen to Tilly’s introduction first.';
+ playMission6Clip(0,()=>{mission6Ready=true;document.getElementById('jupFeedback').textContent='Now tap Hear Tilly for Question 1.';});
+};
+const jupRenderOriginal=renderJupiter;
+renderJupiter=function(){
+ jupRenderOriginal();
+ if(jupMission!==5)return;
+ let next=document.getElementById('mission6Next');
+ if(!next){next=document.createElement('button');next.id='mission6Next';next.className='primary';next.textContent='➡ Next Question';next.onclick=()=>{
+ if(!mission6WaitingNext||mission6Audio)return;
+ mission6WaitingNext=false;jupIndex++;renderJupiter();
+ if(jupIndex<6){mission6Buttons(true);playMission6Clip(jupIndex+1,()=>{mission6Ready=true;mission6Buttons(false)})}
+ else{mission6Buttons(true);playMission6Clip(7,()=>{mission6Ready=true;mission6Buttons(false)})}
+ };document.querySelector('#jupiterLesson .controls').prepend(next)}
+ next.style.display='none';
+ if(jupIndex<6){mission6Ready=false;mission6Buttons(true)}
+ else{mission6Ready=false;mission6Buttons(true)}
+};
+const jupAnswerOriginal=answerJupiter;
+answerJupiter=function(i){
+ if(jupMission!==5){jupAnswerOriginal(i);return}
+ if(!mission6Ready||mission6Audio||mission6WaitingNext)return;
+ const lesson=jupLessons[5][jupIndex];if(!lesson)return;
+ if(i===lesson[3]){
+  mission6WaitingNext=true;mission6Ready=false;mission6Buttons(true);
+  document.getElementById('jupFeedback').textContent='⭐ Well done, Captain! Press Next Question when you are ready.';
+  const next=document.getElementById('mission6Next');next.style.display='inline-block';next.disabled=false;
+ }else{document.getElementById('jupFeedback').textContent='Not quite! Have another try, Captain.'}
+};
+const jupSpeakOriginal=jupSpeak;
+jupSpeak=function(){
+ if(jupMission!==5){jupSpeakOriginal();return}
+ if(mission6WaitingNext||mission6Audio)return;
+ if(jupIndex>=6){playMission6Clip(7,()=>{mission6Ready=true;mission6Buttons(false)});return}
+ mission6Ready=false;mission6Buttons(true);
+ playMission6Clip(jupIndex+1,()=>{mission6Ready=true;mission6Buttons(false)});
+};
+const jupShowOriginal=show;
+show=function(id){if(id!=='jupiterLesson')stopMission6Audio();jupShowOriginal(id)};
+</script><div id="planetDiscovery" role="dialog" aria-modal="true" aria-label="Planet animation"><div class="discovery-panel planet-video-panel"><button class="secondary" id="devAcademyButton" style="float:left" onclick="openDeveloperAcademy()">🛠 Test Academy</button><button class="secondary" style="float:right" onclick="closeDiscovery()">✕ Close</button><video id="discoveryVideo" playsinline muted loop preload="none"></video></div></div><script>
+function arloSplashStart(){
+ const btn=document.getElementById('arloSplashPlay');
+ const status=document.getElementById('arloSplashStatus');
+ if(window.welcomeNarrationStarted)return;
+ status.textContent='Tilly is welcoming you aboard…';
+ startGame();
+ // Keep the picture displayed until the new Tilly intro finishes.
+ // If audio playback fails, leave PLAY available for another attempt.
+
+}
+</script></body></html>
