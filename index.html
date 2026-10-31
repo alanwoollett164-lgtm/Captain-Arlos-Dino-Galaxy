@@ -630,4 +630,42 @@ show=function(id){
   quarterQuestOriginalShow(id);
 };
 </script>
+
+<script>
+// Quarter Quest: spoken correct/incorrect feedback using approved Blondie v3 clips.
+let quarterQuestFeedback=null;
+function stopQuarterQuestFeedback(){
+  if(quarterQuestFeedback){quarterQuestFeedback.pause();quarterQuestFeedback.onended=null;quarterQuestFeedback.onerror=null;quarterQuestFeedback=null;}
+}
+const quarterQuestAnswerBeforeFeedback=answerJupiter;
+answerJupiter=function(i){
+  if(jupMission!==1){quarterQuestAnswerBeforeFeedback(i);return;}
+  if(jupLocked)return;
+  const lesson=jupLessons[1][jupIndex];if(!lesson)return;
+  stopQuarterQuestAudio();stopQuarterQuestFeedback();
+  const correct=i===lesson[3];
+  if(correct)jupLocked=true;
+  document.getElementById('jupFeedback').textContent=correct?'⭐ Brilliant, Captain! Well done!':'🦖 Not quite! Look at the equal pieces. Try again!';
+  const clip=new Audio(correct?'audio/jupiter_m2_correct.mp3':'audio/jupiter_m2_retry.mp3');
+  quarterQuestFeedback=clip;
+  let finished=false;
+  const finish=()=>{
+    if(finished || quarterQuestFeedback!==clip)return;
+    finished=true;quarterQuestFeedback=null;
+    if(correct && jupMission===1){jupIndex++;renderJupiter();}
+  };
+  clip.onended=finish;clip.onerror=finish;
+  clip.play().catch(finish);
+};
+const quarterQuestShowBeforeFeedback=show;
+show=function(id){
+  if(id!=='jupiterLesson')stopQuarterQuestFeedback();
+  quarterQuestShowBeforeFeedback(id);
+};
+const quarterQuestStartBeforeFeedback=startJupiter;
+startJupiter=function(i){
+  stopQuarterQuestFeedback();
+  quarterQuestStartBeforeFeedback(i);
+};
+</script>
 </body></html>
