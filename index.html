@@ -583,4 +583,51 @@ function arloSplashStart(){
  // If audio playback fails, leave PLAY available for another attempt.
 
 }
-</script></body></html>
+</script>
+<script>
+// Jupiter Mission 2: six approved Blondie Conversational / ElevenLabs v3 clips.
+const quarterQuestClips = [
+  'audio/jupiter_m2_q1.mp3','audio/jupiter_m2_q2.mp3',
+  'audio/jupiter_m2_q3.mp3','audio/jupiter_m2_q4.mp3',
+  'audio/jupiter_m2_q5.mp3','audio/jupiter_m2_q6.mp3'
+];
+let quarterQuestAudio = null;
+function stopQuarterQuestAudio(){
+  if(quarterQuestAudio){quarterQuestAudio.pause();quarterQuestAudio.onended=null;quarterQuestAudio=null;}
+}
+function playQuarterQuestAudio(){
+  stopQuarterQuestAudio();
+  if(jupMission!==1 || jupIndex>=quarterQuestClips.length)return;
+  if('speechSynthesis' in window)speechSynthesis.cancel();
+  const clip=new Audio(quarterQuestClips[jupIndex]);
+  quarterQuestAudio=clip;
+  clip.onerror=()=>{if(quarterQuestAudio===clip)quarterQuestAudio=null;};
+  clip.play().catch(()=>{if(quarterQuestAudio===clip)quarterQuestAudio=null;});
+}
+const quarterQuestOriginalRender=renderJupiter;
+renderJupiter=function(){
+  quarterQuestOriginalRender();
+  if(jupMission===1 && jupIndex<6)playQuarterQuestAudio();
+};
+const quarterQuestOriginalSpeak=jupSpeak;
+jupSpeak=function(){
+  if(jupMission===1){playQuarterQuestAudio();return;}
+  quarterQuestOriginalSpeak();
+};
+const quarterQuestOriginalStart=startJupiter;
+startJupiter=function(i){
+  stopQuarterQuestAudio();
+  quarterQuestOriginalStart(i);
+};
+const quarterQuestOriginalAnswer=answerJupiter;
+answerJupiter=function(i){
+  if(jupMission===1 && jupLessons[1][jupIndex] && i===jupLessons[1][jupIndex][3])stopQuarterQuestAudio();
+  quarterQuestOriginalAnswer(i);
+};
+const quarterQuestOriginalShow=show;
+show=function(id){
+  if(id!=='jupiterLesson')stopQuarterQuestAudio();
+  quarterQuestOriginalShow(id);
+};
+</script>
+</body></html>
