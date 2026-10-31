@@ -668,4 +668,66 @@ startJupiter=function(i){
   quarterQuestStartBeforeFeedback(i);
 };
 </script>
+
+<script>
+// Jupiter Mission 3: Fraction Factory, Tilly's eight recorded voice clips.
+const fractionFactoryClips=[
+ 'audio/jupiter_m3_q1.mp3','audio/jupiter_m3_q2.mp3','audio/jupiter_m3_q3.mp3',
+ 'audio/jupiter_m3_q4.mp3','audio/jupiter_m3_q5.mp3','audio/jupiter_m3_q6.mp3'
+];
+let fractionFactoryAudio=null;
+let fractionFactoryFeedback=null;
+function stopFractionFactoryAudio(){
+ if(fractionFactoryAudio){fractionFactoryAudio.pause();fractionFactoryAudio.onended=null;fractionFactoryAudio.onerror=null;fractionFactoryAudio=null;}
+}
+function stopFractionFactoryFeedback(){
+ if(fractionFactoryFeedback){fractionFactoryFeedback.pause();fractionFactoryFeedback.onended=null;fractionFactoryFeedback.onerror=null;fractionFactoryFeedback=null;}
+}
+function playFractionFactoryQuestion(){
+ stopFractionFactoryAudio();
+ if(jupMission!==2||jupIndex>=6)return;
+ if('speechSynthesis' in window)speechSynthesis.cancel();
+ const a=new Audio(fractionFactoryClips[jupIndex]);fractionFactoryAudio=a;
+ a.onerror=()=>{if(fractionFactoryAudio===a)fractionFactoryAudio=null;};
+ a.play().catch(()=>{if(fractionFactoryAudio===a)fractionFactoryAudio=null;});
+}
+const fractionFactoryPreviousRender=renderJupiter;
+renderJupiter=function(){
+ fractionFactoryPreviousRender();
+ if(jupMission===2&&jupIndex<6)playFractionFactoryQuestion();
+};
+const fractionFactoryPreviousSpeak=jupSpeak;
+jupSpeak=function(){
+ if(jupMission===2){if(!jupLocked)playFractionFactoryQuestion();return;}
+ fractionFactoryPreviousSpeak();
+};
+const fractionFactoryPreviousAnswer=answerJupiter;
+answerJupiter=function(i){
+ if(jupMission!==2){fractionFactoryPreviousAnswer(i);return;}
+ if(jupLocked)return;
+ const lesson=jupLessons[2][jupIndex];if(!lesson)return;
+ stopFractionFactoryAudio();stopFractionFactoryFeedback();
+ const correct=i===lesson[3];
+ if(correct)jupLocked=true;
+ document.getElementById('jupFeedback').textContent=correct?'⭐ Brilliant, Captain! Well done!':'🦖 Not quite! Look at the equal pieces. Try again!';
+ const clip=new Audio(correct?'audio/jupiter_m3_correct.mp3':'audio/jupiter_m3_retry.mp3');
+ fractionFactoryFeedback=clip;let done=false;
+ const finish=()=>{
+  if(done||fractionFactoryFeedback!==clip)return;
+  done=true;fractionFactoryFeedback=null;
+  if(correct&&jupMission===2){jupIndex++;renderJupiter();}
+ };
+ clip.onended=finish;clip.onerror=finish;clip.play().catch(finish);
+};
+const fractionFactoryPreviousStart=startJupiter;
+startJupiter=function(i){
+ stopFractionFactoryAudio();stopFractionFactoryFeedback();
+ fractionFactoryPreviousStart(i);
+};
+const fractionFactoryPreviousShow=show;
+show=function(id){
+ if(id!=='jupiterLesson'){stopFractionFactoryAudio();stopFractionFactoryFeedback();}
+ fractionFactoryPreviousShow(id);
+};
+</script>
 </body></html>
