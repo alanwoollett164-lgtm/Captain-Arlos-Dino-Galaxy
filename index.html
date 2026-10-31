@@ -730,4 +730,65 @@ show=function(id){
  fractionFactoryPreviousShow(id);
 };
 </script>
+<script>
+// Jupiter Mission 4: Fraction Rescue, Tilly's eight recorded voice clips.
+const fractionRescueClips=[
+ 'audio/jupiter_m4_q1.mp3','audio/jupiter_m4_q2.mp3','audio/jupiter_m4_q3.mp3',
+ 'audio/jupiter_m4_q4.mp3','audio/jupiter_m4_q5.mp3','audio/jupiter_m4_q6.mp3'
+];
+let fractionRescueAudio=null;
+let fractionRescueFeedback=null;
+function stopFractionRescueAudio(){
+ if(fractionRescueAudio){fractionRescueAudio.pause();fractionRescueAudio.onended=null;fractionRescueAudio.onerror=null;fractionRescueAudio=null;}
+}
+function stopFractionRescueFeedback(){
+ if(fractionRescueFeedback){fractionRescueFeedback.pause();fractionRescueFeedback.onended=null;fractionRescueFeedback.onerror=null;fractionRescueFeedback=null;}
+}
+function playFractionRescueQuestion(){
+ stopFractionRescueAudio();
+ if(jupMission!==3||jupIndex>=6)return;
+ if('speechSynthesis' in window)speechSynthesis.cancel();
+ const a=new Audio(fractionRescueClips[jupIndex]);fractionRescueAudio=a;
+ a.onerror=()=>{if(fractionRescueAudio===a)fractionRescueAudio=null;};
+ a.play().catch(()=>{if(fractionRescueAudio===a)fractionRescueAudio=null;});
+}
+const fractionRescuePreviousRender=renderJupiter;
+renderJupiter=function(){
+ fractionRescuePreviousRender();
+ if(jupMission===3&&jupIndex<6)playFractionRescueQuestion();
+};
+const fractionRescuePreviousSpeak=jupSpeak;
+jupSpeak=function(){
+ if(jupMission===3){if(!jupLocked)playFractionRescueQuestion();return;}
+ fractionRescuePreviousSpeak();
+};
+const fractionRescuePreviousAnswer=answerJupiter;
+answerJupiter=function(i){
+ if(jupMission!==3){fractionRescuePreviousAnswer(i);return;}
+ if(jupLocked)return;
+ const lesson=jupLessons[3][jupIndex];if(!lesson)return;
+ stopFractionRescueAudio();stopFractionRescueFeedback();
+ const correct=i===lesson[3];
+ if(correct)jupLocked=true;
+ document.getElementById('jupFeedback').textContent=correct?'⭐ Brilliant, Captain! Well done!':'🦖 Not quite! Look at the equal pieces. Try again!';
+ const clip=new Audio(correct?'audio/jupiter_m4_correct.mp3':'audio/jupiter_m4_retry.mp3');
+ fractionRescueFeedback=clip;let done=false;
+ const finish=()=>{
+  if(done||fractionRescueFeedback!==clip)return;
+  done=true;fractionRescueFeedback=null;
+  if(correct&&jupMission===3){jupIndex++;renderJupiter();}
+ };
+ clip.onended=finish;clip.onerror=finish;clip.play().catch(finish);
+};
+const fractionRescuePreviousStart=startJupiter;
+startJupiter=function(i){
+ stopFractionRescueAudio();stopFractionRescueFeedback();
+ fractionRescuePreviousStart(i);
+};
+const fractionRescuePreviousShow=show;
+show=function(id){
+ if(id!=='jupiterLesson'){stopFractionRescueAudio();stopFractionRescueFeedback();}
+ fractionRescuePreviousShow(id);
+};
+</script>
 </body></html>
